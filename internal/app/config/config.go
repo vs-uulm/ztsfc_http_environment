@@ -1,7 +1,6 @@
 package config
 
 import (
-    "github.com/vs-uulm/ztsfc_http_environment/internal/app/config"
 )
 
 var (

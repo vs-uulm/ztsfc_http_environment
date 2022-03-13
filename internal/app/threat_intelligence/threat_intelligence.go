@@ -1,6 +1,7 @@
 package threat_intelligence
 
 import (
+    "fmt"
     "net/http"
     "io/ioutil"
 
@@ -19,7 +20,7 @@ func handleFlowAlert(w http.ResponseWriter, req *http.Request) {
     fmt.Printf("Alert: %s", string(alertBytes))
 }
 
-func runThreatIntelligence(sysLogger *logger.Logger) error {
+func RunThreatIntelligence(sysLogger *logger.Logger) error {
     http.HandleFunc("/handleFlowAlert", handleFlowAlert)
 
     web_server := http.Server{
@@ -27,7 +28,7 @@ func runThreatIntelligence(sysLogger *logger.Logger) error {
     }
 
     err := web_server.ListenAndServe()
-    if err != {
+    if err != nil {
         return fmt.Errorf("threat_intelligence: runThreatIntelligence(): %v", err)
     }
 

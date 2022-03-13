@@ -3,6 +3,7 @@ package main
 import (
     "flag"
     "log"
+    "github.com/vs-uulm/ztsfc_http_environment/internal/app/config"
     yt "github.com/leobrada/yaml_tools"
     logger "github.com/vs-uulm/ztsfc_http_logger"
     confInit "github.com/vs-uulm/ztsfc_http_environment/internal/app/init"
@@ -29,20 +30,19 @@ func init() {
         config.Config.SysLogger.LogLevel,
         config.Config.SysLogger.IfTextFormatter,
         logger.Fields{"type": "system"},
-    }
-    if err ! nil {
+    )
+    if err != nil {
         log.Fatalf("main: init(): could not initialize logger: %v", err)
     }
-    confInit.SetupCloseHandler(sysLogger)
     sysLogger.Debugf("loading logger configuration from %s - OK", confFilePath)
 
-    if err = confInit.InitConfig(); err != nil {
+    if err = confInit.InitConfig(sysLogger); err != nil {
         sysLogger.Fatalf("main: init(): could not initialize Environment params: %v", err)
     }
 }
 
 func main() {
-    go ti.runThreatIntelligence(sysLogger)
+    go ti.RunThreatIntelligence(sysLogger)
 
     for {
     }

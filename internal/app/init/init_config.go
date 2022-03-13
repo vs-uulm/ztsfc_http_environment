@@ -1,6 +1,8 @@
 package init
 
 import (
+    "fmt"
+
     logger "github.com/vs-uulm/ztsfc_http_logger"
 )
 
