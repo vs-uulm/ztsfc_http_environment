@@ -1,5 +1,7 @@
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
+github.com/leobrada/golang_convenience_tools v0.0.0-20220321082627-ef86f3abd9d1 h1:ZTCtV4j65XRjLfftWCuXrgHA7s0fnGXKzDRgZVZCv/Q=
+github.com/leobrada/golang_convenience_tools v0.0.0-20220321082627-ef86f3abd9d1/go.mod h1:dFsd7aKdV12xS9hk+9raiGEYRBsuwbXRjm9mVq2cxoo=
 github.com/leobrada/yaml_tools v0.0.0-20220115205103-7f6e1de7ab2e h1:n4X/33vxeWGlhENDCMUKufuZifF47Qmo/9hOa8BwBrY=
 github.com/leobrada/yaml_tools v0.0.0-20220115205103-7f6e1de7ab2e/go.mod h1:S7LK9JN09inLOGGcXFCjFHkGaaBG3loTfg+cDfIKUfQ=
 github.com/pmezard/go-difflib v1.0.0 h1:4DBwDE0NGyQoBHbLQYPwSUPoCMWR5BEzIk/f1lZbAQM=

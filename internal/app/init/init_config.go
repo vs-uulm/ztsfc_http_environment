@@ -2,13 +2,15 @@ package init
 
 import (
     "fmt"
-
-    logger "github.com/vs-uulm/ztsfc_http_logger"
 )
 
 
-func InitConfig(sysLogger *logger.Logger) error {
-    if err := initThreatIntelligence(sysLogger); err != nil {
+func InitConfig() error {
+    if err := initThreatIntelligence(); err != nil {
+        return fmt.Errorf("init: InitConfig(): %v", err)
+    }
+
+    if err := initPip(); err != nil {
         return fmt.Errorf("init: InitConfig(): %v", err)
     }
 

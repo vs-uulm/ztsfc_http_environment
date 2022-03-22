@@ -3,12 +3,10 @@ package init
 import (
     "fmt"
     "strings"
-
-    logger "github.com/vs-uulm/ztsfc_http_logger"
-    "github.com/vs-uulm/ztsfc_http_environment/internal/app/config"
+    "github.com/vs-uulm/ztsfc_http_pip/internal/app/config"
 )
 
-func initThreatIntelligence(sysLogger *logger.Logger) error {
+func initThreatIntelligence() error {
     fields := ""
    
     // TODO: Check if the field make sense as well!

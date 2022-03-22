@@ -4,7 +4,7 @@
 package init
 
 import (
-    "github.com/vs-uulm/ztsfc_http_environment/internal/app/config"
+    "github.com/vs-uulm/ztsfc_http_pip/internal/app/config"
 )
 
 // InitSysLoggerParams() sets default values for the system logger parameters
