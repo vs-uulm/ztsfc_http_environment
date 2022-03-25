@@ -49,7 +49,7 @@ func init() {
 func main() {
     go ti.RunThreatIntelligence()
 
-    device.PrintDevices()
+    //device.PrintDevices()
 
     pip := router.NewRouter()
 

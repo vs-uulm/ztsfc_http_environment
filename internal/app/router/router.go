@@ -7,11 +7,14 @@ import (
 
     "github.com/vs-uulm/ztsfc_http_pip/internal/app/config"
     "github.com/vs-uulm/ztsfc_http_pip/internal/app/device"
+
+    rattr "github.com/vs-uulm/ztsfc_http_attributes"
 )
 
 const (
 	// Request URIs for the API endpoint.
 	getDeviceEndpoint = "/get-device-attributes"
+    updateDeviceEndpoint = "/update-device-attributes"
 )
 
 type Router struct {
@@ -38,6 +41,7 @@ func NewRouter() *Router {
 
 	// Create MUX server
     http.HandleFunc(getDeviceEndpoint, handleGetDeviceRequests)
+    http.HandleFunc(updateDeviceEndpoint, handleUpdateDeviceRequests)
 
 	// Create HTTP frontend server
 	router.frontend_server = &http.Server{
@@ -49,6 +53,12 @@ func NewRouter() *Router {
 }
 
 func handleGetDeviceRequests(w http.ResponseWriter, req *http.Request) {
+    if req.Method != "GET" {
+        config.SysLogger.Errorf("router: handleUpdateDeviceRequests(): PDP sent an unsupported HTTP request method")
+        w.WriteHeader(405)
+        return
+    }
+
     q := req.URL.Query()
 
     dev := q.Get("device");
@@ -65,9 +75,33 @@ func handleGetDeviceRequests(w http.ResponseWriter, req *http.Request) {
         return
     }
 
-    config.SysLogger.Infof("router: handleGetDeviceRequests(): PDP requested the following device: %v", requestedDevice)
+    config.SysLogger.Infof("router: handleGetDeviceRequests(): PDP requested the following device: %v", dev)
     w.Header().Set("Content-Type", "application/json")
     json.NewEncoder(w).Encode(requestedDevice)
+}
+
+func handleUpdateDeviceRequests(w http.ResponseWriter, req *http.Request) {
+    if req.Method != "POST" {
+        config.SysLogger.Errorf("router: handleUpdateDeviceRequests(): PDP sent an unsupported HTTP request method")
+        w.WriteHeader(405)
+        return
+    }
+
+    deviceUpdate, _ := rattr.NewEmptyDevice()
+    err := json.NewDecoder(req.Body).Decode(deviceUpdate)
+    if err != nil {
+        config.SysLogger.Errorf("router: handleUpdateDeviceRequests(): could not decode device update from PDP %v", err)
+        return
+    }
+
+    deviceToUpdate, ok := device.DevicesByID[deviceUpdate.DeviceID]
+    if !ok {
+        config.SysLogger.Errorf("router: handleUpdateDeviceRequests(): device '%s' PDP requested to update does not exist", deviceUpdate.DeviceID)
+        return
+    }
+
+    deviceToUpdate.CurrentIP = deviceUpdate.CurrentIP
+    config.SysLogger.Infof("router: handleGetDeviceRequests(): PDP updated the following device: %v", deviceToUpdate)
 }
 
 func (router *Router) ListenAndServeTLS() error {
