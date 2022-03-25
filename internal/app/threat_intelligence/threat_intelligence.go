@@ -8,6 +8,9 @@ import (
     "encoding/base64"
 
     "github.com/vs-uulm/ztsfc_http_pip/internal/app/config"
+    "github.com/vs-uulm/ztsfc_http_pip/internal/app/device"
+
+    rattr "github.com/vs-uulm/ztsfc_http_attributes"
 )
 
 type flowAlert struct {
@@ -44,7 +47,15 @@ func handleFlowAlert(w http.ResponseWriter, req *http.Request) {
         return
     }
 
-    config.SysLogger.Infof("threat_intelligence: runThreatIntelligence(): handleFlowAlert(): exported suspicious IP %s\n", addrIP.String())
+    affectedDevice := rattr.FindDeviceByIPInIDMap(config.SysLogger, addrIP.String(), device.DevicesByID)
+    if affectedDevice == nil {
+        config.SysLogger.Infof("threat_intelligence: runThreatIntelligence(): handleFlowAlert(): exported suspicious IP '%s' is currently not assigned to a managed device\n",
+            addrIP.String())
+    } else {
+        affectedDevice.Revoked = true
+        config.SysLogger.Infof("threat_intelligence: runThreatIntelligence(): handleFlowAlert(): exported suspicious IP '%s' belongs to managed device '%s' that is now revoked\n",
+            addrIP.String(), affectedDevice.DeviceID)
+    }
 }
 
 func RunThreatIntelligence() error {
