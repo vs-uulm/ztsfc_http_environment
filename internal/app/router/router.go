@@ -15,6 +15,7 @@ const (
 	// Request URIs for the API endpoint.
 	getDeviceEndpoint = "/get-device-attributes"
     updateDeviceEndpoint = "/update-device-attributes"
+    getSystemEndpoint = "/get-system-attributes"
 )
 
 type Router struct {
@@ -42,6 +43,7 @@ func NewRouter() *Router {
 	// Create MUX server
     http.HandleFunc(getDeviceEndpoint, handleGetDeviceRequests)
     http.HandleFunc(updateDeviceEndpoint, handleUpdateDeviceRequests)
+    http.HandleFunc(getSystemEndpoint, handleGetSystemRequests)
 
 	// Create HTTP frontend server
 	router.frontend_server = &http.Server{
@@ -54,7 +56,7 @@ func NewRouter() *Router {
 
 func handleGetDeviceRequests(w http.ResponseWriter, req *http.Request) {
     if req.Method != "GET" {
-        config.SysLogger.Errorf("router: handleUpdateDeviceRequests(): PDP sent an unsupported HTTP request method")
+        config.SysLogger.Errorf("router: handleGetDeviceRequests(): PDP sent an unsupported HTTP request method")
         w.WriteHeader(405)
         return
     }
@@ -102,6 +104,18 @@ func handleUpdateDeviceRequests(w http.ResponseWriter, req *http.Request) {
 
     deviceToUpdate.CurrentIP = deviceUpdate.CurrentIP
     config.SysLogger.Infof("router: handleGetDeviceRequests(): PDP updated the following device: %v", deviceToUpdate)
+}
+
+func handleGetSystemRequests(w http.ResponseWriter, req *http.Request) {
+    if req.Method != "GET" {
+        config.SysLogger.Errorf("router: handleGetSystemRequests(): PDP sent an unsupported HTTP request method")
+        w.WriteHeader(405)
+        return
+    }
+
+    config.SysLogger.Infof("router: handleGetSystemRequests(): PDP requested the system attributes")
+    w.Header.Set("Content-Type", "application/json")
+    json.NewEncoder(w).Encode(system.System)
 }
 
 func (router *Router) ListenAndServeTLS() error {
