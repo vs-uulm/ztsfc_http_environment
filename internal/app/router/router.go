@@ -7,6 +7,7 @@ import (
 
     "github.com/vs-uulm/ztsfc_http_pip/internal/app/config"
     "github.com/vs-uulm/ztsfc_http_pip/internal/app/device"
+    "github.com/vs-uulm/ztsfc_http_pip/internal/app/system"
 
     rattr "github.com/vs-uulm/ztsfc_http_attributes"
 )
@@ -114,7 +115,7 @@ func handleGetSystemRequests(w http.ResponseWriter, req *http.Request) {
     }
 
     config.SysLogger.Infof("router: handleGetSystemRequests(): PDP requested the system attributes")
-    w.Header.Set("Content-Type", "application/json")
+    w.Header().Set("Content-Type", "application/json")
     json.NewEncoder(w).Encode(system.System)
 }
 
