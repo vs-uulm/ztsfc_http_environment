@@ -1,0 +1,20 @@
+system_logger:
+  system_logger_logging_level: debug
+  system_logger_destination: stdout
+  system_logger_format: text
+
+pip:
+  listen_addr: "pip.example.com:443"
+  certs_pip_accepts_when_shown_by_pip:
+    - ./certs/ca.crt
+  cert_shown_by_pip_to_pip: ./certs/certificate.pem
+  privkey_for_cert_shown_by_pip_to_pip: ./certs/certificate.key
+  logging_hook:
+    hook_url: "http://loki.example.com:3100/loki/api/v1/push"
+    cert_shown_by_pip_to_hook: ./certs/certificate.pem
+    privkey_for_cert_shown_by_pip_to_hook: ./certs/certificate.key
+    certs_pip_accepts_when_shown_by_hook:
+      - ./certs/ca.crt
+
+threat_intelligence:
+  listen_addr: "pip.example.com:8080"
