@@ -16,7 +16,6 @@
 # vendor/
 .env
 *.log
-certs
 main
 *.pprof
 *.swp
