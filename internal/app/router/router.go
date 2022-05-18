@@ -114,6 +114,9 @@ func handleGetSystemRequests(w http.ResponseWriter, req *http.Request) {
         return
     }
 
+
+    config.SysLogger.Infof("HELLO TEST")
+
     config.SysLogger.Infof("router: handleGetSystemRequests(): PDP requested the system attributes")
     w.Header().Set("Content-Type", "application/json")
     json.NewEncoder(w).Encode(system.System)
