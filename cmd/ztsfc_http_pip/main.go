@@ -1,15 +1,16 @@
 package main
 
 import (
-    "flag"
-    "log"
-    "github.com/vs-uulm/ztsfc_http_pip/internal/app/router"
-    "github.com/vs-uulm/ztsfc_http_pip/internal/app/config"
-    "github.com/vs-uulm/ztsfc_http_pip/internal/app/device"
-    yt "github.com/leobrada/yaml_tools"
-    logger "github.com/vs-uulm/ztsfc_http_logger"
-    confInit "github.com/vs-uulm/ztsfc_http_pip/internal/app/init"
-    ti "github.com/vs-uulm/ztsfc_http_pip/internal/app/threat_intelligence"
+	"flag"
+	"log"
+
+	yt "github.com/leobrada/yaml_tools"
+	logger "github.com/vs-uulm/ztsfc_http_logger"
+	"github.com/vs-uulm/ztsfc_http_pip/internal/app/config"
+	"github.com/vs-uulm/ztsfc_http_pip/internal/app/device"
+	confInit "github.com/vs-uulm/ztsfc_http_pip/internal/app/init"
+	"github.com/vs-uulm/ztsfc_http_pip/internal/app/router"
+	ti "github.com/vs-uulm/ztsfc_http_pip/internal/app/threat_intelligence"
 )
 
 //var (
@@ -17,41 +18,45 @@ import (
 //)
 
 func init() {
-    var confFilePath string
+	var confFilePath string
 
-    flag.StringVar(&confFilePath, "c", "./config/conf.yml", "Path to user defined yaml config file")
-    flag.Parse()
+	flag.StringVar(&confFilePath, "c", "./config/conf.yml", "Path to user defined yaml config file")
+	flag.Parse()
 
-    err := yt.LoadYamlFile(confFilePath, &config.Config)
-    if err != nil {
-        log.Fatalf("main: init(): could not load yaml file: %v", err)
-    }
+	err := yt.LoadYamlFile(confFilePath, &config.Config)
+	if err != nil {
+		log.Fatalf("main: init(): could not load yaml file: %s", err.Error())
+	}
 
-    confInit.InitSysLoggerParams()
-    config.SysLogger, err = logger.New(config.Config.SysLogger.LogFilePath,
-        config.Config.SysLogger.LogLevel,
-        config.Config.SysLogger.IfTextFormatter,
-        logger.Fields{"type": "system"},
-    )
-    if err != nil {
-        log.Fatalf("main: init(): could not initialize logger: %v", err)
-    }
-    config.SysLogger.Debugf("loading logger configuration from %s - OK", confFilePath)
+	confInit.InitSysLoggerParams()
+	config.SysLogger, err = logger.New(config.Config.SysLogger.LogFilePath,
+		config.Config.SysLogger.LogLevel,
+		config.Config.SysLogger.IfTextFormatter,
+		logger.Fields{"type": "system"},
+	)
+	if err != nil {
+		log.Fatalf("main: init(): could not initialize logger: %s", err.Error())
+	}
+	config.SysLogger.Debugf("loading pip configuration from '%s' - OK", confFilePath)
 
-    if err = confInit.InitConfig(); err != nil {
-        config.SysLogger.Fatalf("main: init(): could not initialize Environment params: %v", err)
-    }
+	if err = confInit.InitConfig(); err != nil {
+		config.SysLogger.Fatalf("main: init(): could not initialize environment params: %s", err.Error())
+	}
 
-    // For testing
-    device.LoadTestDevices()
+	// For testing
+	device.LoadTestDevices()
 }
 
 func main() {
-    go ti.RunThreatIntelligence()
+	var err error
+	go ti.RunThreatIntelligence()
 
-    //device.PrintDevices()
+	//device.PrintDevices()
 
-    pip := router.NewRouter()
+	pip := router.NewRouter()
 
-    pip.ListenAndServeTLS()
+	err = pip.ListenAndServeTLS()
+	if err != nil {
+		log.Fatalf("main: main(): listen and serve failed: %s", err.Error())
+	}
 }
