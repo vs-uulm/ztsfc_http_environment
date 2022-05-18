@@ -1,18 +1,17 @@
 package init
 
 import (
-    "fmt"
+	"fmt"
 )
 
-
 func InitConfig() error {
-    if err := initThreatIntelligence(); err != nil {
-        return fmt.Errorf("init: InitConfig(): %v", err)
-    }
+	if err := initThreatIntelligence(); err != nil {
+		return fmt.Errorf("init: InitConfig(): %s", err.Error())
+	}
 
-    if err := initPip(); err != nil {
-        return fmt.Errorf("init: InitConfig(): %v", err)
-    }
+	if err := initPip(); err != nil {
+		return fmt.Errorf("init: InitConfig(): %s", err.Error())
+	}
 
-    return nil
+	return nil
 }
