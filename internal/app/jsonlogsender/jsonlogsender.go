@@ -80,13 +80,14 @@ func (ls *JSONLogSender) Send(job, threatLevel, user, uts, device, dts, tts, res
 	return nil
 }
 
-func (ls *JSONLogSender) SendThreatLevel(job string, level int) error {
+func (ls *JSONLogSender) SendThreatLevel(job string, level, newThreshold int) error {
 	s := fmt.Sprintf(`{"streams": [
 		{"stream":
-			{ "job": "%s" },
+			{ "job": "%s",
+		      "threshold": "%d"},
 		 "values":
 		 	[[ "%d", {"mes":"Threat Level update", "tl":"%d"} ]]}
-	]}`, job, time.Now().UnixNano(), level)
+	]}`, job, newThreshold, time.Now().UnixNano(), level)
 
 	fmt.Printf("JSON log to be sent: %s\n", s)
 
