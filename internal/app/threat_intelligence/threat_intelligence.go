@@ -89,7 +89,7 @@ func RunThreatIntelligence() error {
 		for {
 			select {
 			case <-ticker.C:
-				logSender.SendThreatLevel("ztsfc_pip", system.System.ThreatLevel, 25)
+				logSender.SendThreatLevel("ztsfc_pip", system.System.ThreatLevel, 25+system.System.ThreatLevel*10)
 			case <-quit:
 				ticker.Stop()
 				return
