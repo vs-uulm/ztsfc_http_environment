@@ -89,7 +89,7 @@ func (ls *JSONLogSender) SendThreatLevel(job string, level, newThreshold int) er
 		 	[[ "%d", {"mes":"Threat Level update", "tl":"%d"} ]]}
 	]}`, job, newThreshold, time.Now().UnixNano(), level)
 
-	fmt.Printf("JSON log to be sent: %s\n", s)
+	// fmt.Printf("JSON log to be sent: %s\n", s)
 
 	req, err := http.NewRequest("POST", ls.HookURL, bytes.NewBuffer([]byte(s)))
 	if err != nil {
