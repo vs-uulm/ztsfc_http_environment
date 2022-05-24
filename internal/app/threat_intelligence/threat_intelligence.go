@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"net"
 	"net/http"
+	"time"
 
 	"github.com/vs-uulm/ztsfc_http_pip/internal/app/config"
 	"github.com/vs-uulm/ztsfc_http_pip/internal/app/device"
@@ -82,10 +83,19 @@ func RunThreatIntelligence() error {
 		return err
 	}
 
-	err = logSender.SendThreatLevel("ztsfc_pip", system.System.ThreatLevel, 25)
-	if err != nil {
-		return fmt.Errorf("RunThreatIntelligence(): unable to send the system threat level: %s", err.Error())
-	}
+	ticker := time.NewTicker(1 * time.Second)
+	quit := make(chan struct{})
+	go func() {
+		for {
+			select {
+			case <-ticker.C:
+				logSender.SendThreatLevel("ztsfc_pip", system.System.ThreatLevel, 25)
+			case <-quit:
+				ticker.Stop()
+				return
+			}
+		}
+	}()
 
 	http.HandleFunc("/handleFlowAlert", handleFlowAlert)
 
