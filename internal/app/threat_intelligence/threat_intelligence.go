@@ -68,11 +68,11 @@ func handleFlowAlert(w http.ResponseWriter, req *http.Request) {
 	// Indirect Reaction
 	system.System.ThreatLevel = 1
 
-	err = logSender.SendThreatLevel("ztsfc_pip", system.System.ThreatLevel, 35)
-	if err != nil {
-		config.SysLogger.Errorf("threat_intelligence: runThreatIntelligence(): handleFlowAlert(): unable to send the Treat Level value: %s", err.Error())
-		return
-	}
+	// err = logSender.SendThreatLevel("ztsfc_pip", system.System.ThreatLevel, 35)
+	// if err != nil {
+	// 	config.SysLogger.Errorf("threat_intelligence: runThreatIntelligence(): handleFlowAlert(): unable to send the Treat Level value: %s", err.Error())
+	// 	return
+	// }
 
 }
 
