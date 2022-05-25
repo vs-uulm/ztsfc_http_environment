@@ -84,10 +84,10 @@ func (ls *JSONLogSender) SendThreatLevel(job string, level, newThreshold int) er
 	s := fmt.Sprintf(`{"streams": [
 		{"stream":
 			{ "job": "%s",
-		      "threshold": "%d"},
+		      "threshold_label": "%d"},
 		 "values":
-		 	[[ "%d", {"mes":"Threat Level update", "tl":"%d"} ]]}
-	]}`, job, newThreshold, time.Now().UnixNano(), level)
+		 	[[ "%d", {"mes":"Threat Level update", "tl":"%d", "threshold_field": "%d"} ]]}
+	]}`, job, newThreshold, time.Now().UnixNano(), level, newThreshold)
 
 	// fmt.Printf("JSON log to be sent: %s\n", s)
 
