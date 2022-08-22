@@ -6,6 +6,7 @@ import (
     "github.com/vs-uulm/ztsfc_http_pip/internal/app/router"
     "github.com/vs-uulm/ztsfc_http_pip/internal/app/config"
     "github.com/vs-uulm/ztsfc_http_pip/internal/app/device"
+    "github.com/vs-uulm/ztsfc_http_pip/internal/app/user"
     yt "github.com/leobrada/yaml_tools"
     logger "github.com/vs-uulm/ztsfc_http_logger"
     confInit "github.com/vs-uulm/ztsfc_http_pip/internal/app/init"
@@ -44,6 +45,7 @@ func init() {
 
     // For testing
     device.LoadTestDevices()
+    user.LoadTestUser()
 }
 
 func main() {
