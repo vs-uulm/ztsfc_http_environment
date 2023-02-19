@@ -10,4 +10,5 @@ var (
 
 type DatabaseT struct {
     UserDB map[string]*rattr.User `yaml:"user"`
+    DeviceDB map[string]*rattr.Device `yaml:"device"`
 }

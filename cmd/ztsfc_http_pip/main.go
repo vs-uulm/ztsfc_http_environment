@@ -6,7 +6,7 @@ import (
     "github.com/vs-uulm/ztsfc_http_pip/internal/app/router"
     "github.com/vs-uulm/ztsfc_http_pip/internal/app/config"
     "github.com/vs-uulm/ztsfc_http_pip/internal/app/database"
-    "github.com/vs-uulm/ztsfc_http_pip/internal/app/device"
+    //"github.com/vs-uulm/ztsfc_http_pip/internal/app/device"
     //"github.com/vs-uulm/ztsfc_http_pip/internal/app/user"
     yt "github.com/leobrada/yaml_tools"
     logger "github.com/vs-uulm/ztsfc_http_logger"
@@ -52,20 +52,10 @@ func init() {
     if err = confInit.InitConfig(); err != nil {
         config.SysLogger.Fatalf("main: init(): could not initialize Environment params: %v", err)
     }
-
-    // For testing
-    device.LoadTestDevices()
-    for key, val := range database.Database.UserDB {
-        config.SysLogger.Infof("%s: %v\n", key, val)
-    }
-    //user.LoadTestUser()
 }
 
 func main() {
     //go ti.RunThreatIntelligence()
-
-    //device.PrintDevices()
-
     pip := router.NewRouter()
 
     pip.ListenAndServeTLS()

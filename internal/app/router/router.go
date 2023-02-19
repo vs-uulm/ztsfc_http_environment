@@ -7,7 +7,7 @@ import (
 
     "github.com/vs-uulm/ztsfc_http_pip/internal/app/config"
     "github.com/vs-uulm/ztsfc_http_pip/internal/app/database"
-    "github.com/vs-uulm/ztsfc_http_pip/internal/app/device"
+//    "github.com/vs-uulm/ztsfc_http_pip/internal/app/device"
 //    "github.com/vs-uulm/ztsfc_http_pip/internal/app/user"
     "github.com/vs-uulm/ztsfc_http_pip/internal/app/system"
 
@@ -77,7 +77,7 @@ func handleGetDeviceRequests(w http.ResponseWriter, req *http.Request) {
         return
     }
 
-    requestedDevice, ok := device.DevicesByID[dev]
+    requestedDevice, ok := database.Database.DeviceDB[dev]
     if !ok {
         config.SysLogger.Infof("router: handleGetDeviceRequests(): PDP requested a device that does not exist in the DB")
         w.WriteHeader(404)
@@ -103,7 +103,7 @@ func handleUpdateDeviceRequests(w http.ResponseWriter, req *http.Request) {
         return
     }
 
-    deviceToUpdate, ok := device.DevicesByID[deviceUpdate.DeviceID]
+    deviceToUpdate, ok := database.Database.DeviceDB[deviceUpdate.DeviceID]
     if !ok {
         config.SysLogger.Errorf("router: handleUpdateDeviceRequests(): device '%s' PDP requested to update does not exist", deviceUpdate.DeviceID)
         return

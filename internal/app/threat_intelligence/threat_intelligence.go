@@ -8,7 +8,7 @@ import (
     "encoding/base64"
 
     "github.com/vs-uulm/ztsfc_http_pip/internal/app/config"
-    "github.com/vs-uulm/ztsfc_http_pip/internal/app/device"
+    "github.com/vs-uulm/ztsfc_http_pip/internal/app/database"
     "github.com/vs-uulm/ztsfc_http_pip/internal/app/system"
 
     rattr "github.com/vs-uulm/ztsfc_http_attributes"
@@ -49,7 +49,7 @@ func handleFlowAlert(w http.ResponseWriter, req *http.Request) {
         return
     }
 
-    affectedDevice := rattr.FindDeviceByIPInIDMap(config.SysLogger, addrIP.String(), device.DevicesByID)
+    affectedDevice := rattr.FindDeviceByIPInIDMap(config.SysLogger, addrIP.String(), database.Database.DeviceDB)
     if affectedDevice == nil {
         config.SysLogger.Infof("threat_intelligence: runThreatIntelligence(): handleFlowAlert(): exported suspicious IP " +
             "'%s' is currently not assigned to a managed device\n",
