@@ -5,6 +5,6 @@ import (
 )
 
 func LoadTestUser() {
-    reinerCalumny := rattr.NewUser("reiner.calumny@ztsfc.com", 0, 8, 16, []string{"service1.testbed.informatik.uni-ulm.de"})
-    UserByID[reinerCalumny.UserID] = reinerCalumny
+    leo := rattr.NewUser("Leo", 0, 8, 16, []string{"wiki.bwnet.informatik.uni-ulm.de"})
+    UserByID[leo.UserID] = leo
 }

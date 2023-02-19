@@ -1,0 +1,8 @@
+user:
+  Alice:
+    user_id: "Alice"
+    failed_pw_authentication: 0
+    usual_time_begin: 8
+    usual_time_end: 20
+    usual_services:
+      - "service.ztsfc.com"

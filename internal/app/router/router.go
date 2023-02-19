@@ -6,8 +6,9 @@ import (
 	"net/http"
 
     "github.com/vs-uulm/ztsfc_http_pip/internal/app/config"
+    "github.com/vs-uulm/ztsfc_http_pip/internal/app/database"
     "github.com/vs-uulm/ztsfc_http_pip/internal/app/device"
-    "github.com/vs-uulm/ztsfc_http_pip/internal/app/user"
+//    "github.com/vs-uulm/ztsfc_http_pip/internal/app/user"
     "github.com/vs-uulm/ztsfc_http_pip/internal/app/system"
 
     rattr "github.com/vs-uulm/ztsfc_http_attributes"
@@ -128,7 +129,7 @@ func handleGetUserRequests(w http.ResponseWriter, req *http.Request) {
         return
     }
 
-    requestedUser, ok := user.UserByID[usr]
+    requestedUser, ok := database.Database.UserDB[usr]
     if !ok {
         config.SysLogger.Infof("router: handleGetDeviceRequests(): PDP requested a user that does not exist in the DB")
         w.WriteHeader(404)
@@ -160,7 +161,7 @@ func handlePushUserAttrUpdateRequests(w http.ResponseWriter, req *http.Request) 
 
     failedPWAuthentication := q.Get("failed-pw-authentication")
     if len(failedPWAuthentication) != 0 {
-        requestedUser, ok := user.UserByID[usr]
+        requestedUser, ok := database.Database.UserDB[usr]
         if !ok {
             config.SysLogger.Infof("router: handlePushUserAttrUpdateRequests(): user to update %s could not be found in User DB", usr)
             return

@@ -5,12 +5,13 @@ import (
     "log"
     "github.com/vs-uulm/ztsfc_http_pip/internal/app/router"
     "github.com/vs-uulm/ztsfc_http_pip/internal/app/config"
+    "github.com/vs-uulm/ztsfc_http_pip/internal/app/database"
     "github.com/vs-uulm/ztsfc_http_pip/internal/app/device"
-    "github.com/vs-uulm/ztsfc_http_pip/internal/app/user"
+    //"github.com/vs-uulm/ztsfc_http_pip/internal/app/user"
     yt "github.com/leobrada/yaml_tools"
     logger "github.com/vs-uulm/ztsfc_http_logger"
     confInit "github.com/vs-uulm/ztsfc_http_pip/internal/app/init"
-    ti "github.com/vs-uulm/ztsfc_http_pip/internal/app/threat_intelligence"
+    //ti "github.com/vs-uulm/ztsfc_http_pip/internal/app/threat_intelligence"
 )
 
 //var (
@@ -19,11 +20,20 @@ import (
 
 func init() {
     var confFilePath string
+    var databaseFilePath string
 
     flag.StringVar(&confFilePath, "c", "./config/conf.yml", "Path to user defined yaml config file")
+    flag.StringVar(&databaseFilePath, "d", "./database/database.yml", "Path to user defined yaml database file")
     flag.Parse()
 
+    // Load config file
     err := yt.LoadYamlFile(confFilePath, &config.Config)
+    if err != nil {
+        log.Fatalf("main: init(): could not load yaml file: %v", err)
+    }
+
+    // Load database file
+    err = yt.LoadYamlFile(databaseFilePath, &database.Database)
     if err != nil {
         log.Fatalf("main: init(): could not load yaml file: %v", err)
     }
@@ -45,11 +55,14 @@ func init() {
 
     // For testing
     device.LoadTestDevices()
-    user.LoadTestUser()
+    for key, val := range database.Database.UserDB {
+        config.SysLogger.Infof("%s: %v\n", key, val)
+    }
+    //user.LoadTestUser()
 }
 
 func main() {
-    go ti.RunThreatIntelligence()
+    //go ti.RunThreatIntelligence()
 
     //device.PrintDevices()
 
