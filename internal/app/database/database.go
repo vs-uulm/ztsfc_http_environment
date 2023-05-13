@@ -1,14 +1,17 @@
 package database
 
 import (
-    rattr "github.com/vs-uulm/ztsfc_http_attributes"
+	"sync"
+
+	rattr "github.com/vs-uulm/ztsfc_http_attributes"
 )
 
 var (
-    Database DatabaseT
+	Database         DatabaseT
+	WaitDatabaseList sync.WaitGroup
 )
 
 type DatabaseT struct {
-    UserDB map[string]*rattr.User `yaml:"user"`
-    DeviceDB map[string]*rattr.Device `yaml:"device"`
+	UserDB   map[string]*rattr.User   `yaml:"user"`
+	DeviceDB map[string]*rattr.Device `yaml:"device"`
 }

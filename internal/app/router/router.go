@@ -5,22 +5,23 @@ import (
 	"encoding/json"
 	"net/http"
 
-    "github.com/vs-uulm/ztsfc_http_pip/internal/app/config"
-    "github.com/vs-uulm/ztsfc_http_pip/internal/app/database"
-//    "github.com/vs-uulm/ztsfc_http_pip/internal/app/device"
-//    "github.com/vs-uulm/ztsfc_http_pip/internal/app/user"
-    "github.com/vs-uulm/ztsfc_http_pip/internal/app/system"
+	"github.com/vs-uulm/ztsfc_http_pip/internal/app/config"
+	"github.com/vs-uulm/ztsfc_http_pip/internal/app/database"
 
-    rattr "github.com/vs-uulm/ztsfc_http_attributes"
+	//    "github.com/vs-uulm/ztsfc_http_pip/internal/app/device"
+	//    "github.com/vs-uulm/ztsfc_http_pip/internal/app/user"
+	"github.com/vs-uulm/ztsfc_http_pip/internal/app/system"
+
+	rattr "github.com/vs-uulm/ztsfc_http_attributes"
 )
 
 const (
 	// Request URIs for the API endpoint.
-	getDeviceEndpoint = "/get-device-attributes"
-    updateDeviceEndpoint = "/update-device-attributes"
-    getUserEndpoint = "/get-user-attributes"
-    pushUserAttrUpdatesEndpoint = "/push-user-attr-updates"
-    getSystemEndpoint = "/get-system-attributes"
+	getDeviceEndpoint           = "/get-device-attributes"
+	updateDeviceEndpoint        = "/update-device-attributes"
+	getUserEndpoint             = "/get-user-attributes"
+	pushUserAttrUpdatesEndpoint = "/push-user-attr-updates"
+	getSystemEndpoint           = "/get-system-attributes"
 )
 
 type Router struct {
@@ -46,11 +47,11 @@ func NewRouter() *Router {
 	}
 
 	// Create MUX server
-    http.HandleFunc(getDeviceEndpoint, handleGetDeviceRequests)
-    http.HandleFunc(updateDeviceEndpoint, handleUpdateDeviceRequests)
-    http.HandleFunc(getUserEndpoint, handleGetUserRequests)
-    http.HandleFunc(pushUserAttrUpdatesEndpoint, handlePushUserAttrUpdateRequests)
-    http.HandleFunc(getSystemEndpoint, handleGetSystemRequests)
+	http.HandleFunc(getDeviceEndpoint, handleGetDeviceRequests)
+	http.HandleFunc(updateDeviceEndpoint, handleUpdateDeviceRequests)
+	http.HandleFunc(getUserEndpoint, handleGetUserRequests)
+	http.HandleFunc(pushUserAttrUpdatesEndpoint, handlePushUserAttrUpdateRequests)
+	http.HandleFunc(getSystemEndpoint, handleGetSystemRequests)
 
 	// Create HTTP frontend server
 	router.frontend_server = &http.Server{
@@ -62,126 +63,130 @@ func NewRouter() *Router {
 }
 
 func handleGetDeviceRequests(w http.ResponseWriter, req *http.Request) {
-    if req.Method != "GET" {
-        config.SysLogger.Errorf("router: handleGetDeviceRequests(): PDP sent an unsupported HTTP request method")
-        w.WriteHeader(405)
-        return
-    }
+	if req.Method != "GET" {
+		config.SysLogger.Errorf("router: handleGetDeviceRequests(): PDP sent an unsupported HTTP request method")
+		w.WriteHeader(405)
+		return
+	}
 
-    q := req.URL.Query()
+	q := req.URL.Query()
 
-    dev := q.Get("device");
-    if  len(dev) == 0 {
-        config.SysLogger.Infof("router: handleGetDeviceRequests(): get device request did not contain a device")
-        w.WriteHeader(404)
-        return
-    }
+	dev := q.Get("device")
+	if len(dev) == 0 {
+		config.SysLogger.Infof("router: handleGetDeviceRequests(): get device request did not contain a device")
+		w.WriteHeader(404)
+		return
+	}
 
-    requestedDevice, ok := database.Database.DeviceDB[dev]
-    if !ok {
-        config.SysLogger.Infof("router: handleGetDeviceRequests(): PDP requested a device that does not exist in the DB")
-        w.WriteHeader(404)
-        return
-    }
+	database.WaitDatabaseList.Wait()
+	requestedDevice, ok := database.Database.DeviceDB[dev]
+	if !ok {
+		config.SysLogger.Infof("router: handleGetDeviceRequests(): PDP requested a device that does not exist in the DB")
+		w.WriteHeader(404)
+		return
+	}
 
-    config.SysLogger.Infof("router: handleGetDeviceRequests(): PDP requested the following device: %v", dev)
-    w.Header().Set("Content-Type", "application/json")
-    json.NewEncoder(w).Encode(requestedDevice)
+	config.SysLogger.Infof("router: handleGetDeviceRequests(): PDP requested the following device: %v", dev)
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(requestedDevice)
 }
 
 func handleUpdateDeviceRequests(w http.ResponseWriter, req *http.Request) {
-    if req.Method != "POST" {
-        config.SysLogger.Errorf("router: handleUpdateDeviceRequests(): PDP sent an unsupported HTTP request method")
-        w.WriteHeader(405)
-        return
-    }
+	if req.Method != "POST" {
+		config.SysLogger.Errorf("router: handleUpdateDeviceRequests(): PDP sent an unsupported HTTP request method")
+		w.WriteHeader(405)
+		return
+	}
 
-    deviceUpdate := rattr.NewEmptyDevice()
-    err := json.NewDecoder(req.Body).Decode(deviceUpdate)
-    if err != nil {
-        config.SysLogger.Errorf("router: handleUpdateDeviceRequests(): could not decode device update from PDP %v", err)
-        return
-    }
+	deviceUpdate := rattr.NewEmptyDevice()
+	err := json.NewDecoder(req.Body).Decode(deviceUpdate)
+	if err != nil {
+		config.SysLogger.Errorf("router: handleUpdateDeviceRequests(): could not decode device update from PDP %v", err)
+		return
+	}
 
-    deviceToUpdate, ok := database.Database.DeviceDB[deviceUpdate.DeviceID]
-    if !ok {
-        config.SysLogger.Errorf("router: handleUpdateDeviceRequests(): device '%s' PDP requested to update does not exist", deviceUpdate.DeviceID)
-        return
-    }
+	database.WaitDatabaseList.Wait()
+	deviceToUpdate, ok := database.Database.DeviceDB[deviceUpdate.DeviceID]
+	if !ok {
+		config.SysLogger.Errorf("router: handleUpdateDeviceRequests(): device '%s' PDP requested to update does not exist", deviceUpdate.DeviceID)
+		return
+	}
 
-    deviceToUpdate.CurrentIP = deviceUpdate.CurrentIP
-    config.SysLogger.Infof("router: handleGetDeviceRequests(): PDP updated the following device: %v", deviceToUpdate)
+	deviceToUpdate.CurrentIP = deviceUpdate.CurrentIP
+	config.SysLogger.Infof("router: handleGetDeviceRequests(): PDP updated the following device: %v", deviceToUpdate)
 }
 
 func handleGetUserRequests(w http.ResponseWriter, req *http.Request) {
-    if req.Method != "GET" {
-        config.SysLogger.Errorf("router: handleGetDeviceRequests(): PDP sent an unsupported HTTP request method")
-        w.WriteHeader(405)
-        return
-    }
+	if req.Method != "GET" {
+		config.SysLogger.Errorf("router: handleGetDeviceRequests(): PDP sent an unsupported HTTP request method")
+		w.WriteHeader(405)
+		return
+	}
 
-    q := req.URL.Query()
+	q := req.URL.Query()
 
-    usr := q.Get("user");
-    if len(usr) == 0 {
-        config.SysLogger.Infof("router: handleGetDeviceRequests(): get user request did not contain a user")
-        w.WriteHeader(404)
-        return
-    }
+	usr := q.Get("user")
+	if len(usr) == 0 {
+		config.SysLogger.Infof("router: handleGetDeviceRequests(): get user request did not contain a user")
+		w.WriteHeader(404)
+		return
+	}
 
-    requestedUser, ok := database.Database.UserDB[usr]
-    if !ok {
-        config.SysLogger.Infof("router: handleGetDeviceRequests(): PDP requested a user that does not exist in the DB")
-        w.WriteHeader(404)
-        return
-    }
+	database.WaitDatabaseList.Wait()
+	requestedUser, ok := database.Database.UserDB[usr]
+	if !ok {
+		config.SysLogger.Infof("router: handleGetDeviceRequests(): PDP requested a user that does not exist in the DB")
+		w.WriteHeader(404)
+		return
+	}
 
-    config.SysLogger.Infof("router: handleGetDeviceRequests(): PDP requested the following user: %v", usr)
-    w.Header().Set("Content-Type", "application/json")
-    json.NewEncoder(w).Encode(requestedUser)
+	config.SysLogger.Infof("router: handleGetDeviceRequests(): PDP requested the following user: %v", usr)
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(requestedUser)
 }
 
 // TODO: MUTEX for accessing the user object
 func handlePushUserAttrUpdateRequests(w http.ResponseWriter, req *http.Request) {
-    if req.Method != "POST" {
-        // TODO: Check if its a PEP or PDP or whoever
-        config.SysLogger.Errorf("router: handlePushUserAttrUpdateRequests(): PEP sent an unsupported HTTP request method")
-        w.WriteHeader(405)
-        return
-    }
+	if req.Method != "POST" {
+		// TODO: Check if its a PEP or PDP or whoever
+		config.SysLogger.Errorf("router: handlePushUserAttrUpdateRequests(): PEP sent an unsupported HTTP request method")
+		w.WriteHeader(405)
+		return
+	}
 
-    q := req.URL.Query()
+	q := req.URL.Query()
 
-    usr := q.Get("user")
-    if len(usr) == 0 {
-        config.SysLogger.Infof("router: handlePushUserAttrUpdateRequests(): push user attribute update request did not contain a user")
-        w.WriteHeader(404)
-        return
-    }
+	usr := q.Get("user")
+	if len(usr) == 0 {
+		config.SysLogger.Infof("router: handlePushUserAttrUpdateRequests(): push user attribute update request did not contain a user")
+		w.WriteHeader(404)
+		return
+	}
 
-    failedPWAuthentication := q.Get("failed-pw-authentication")
-    if len(failedPWAuthentication) != 0 {
-        requestedUser, ok := database.Database.UserDB[usr]
-        if !ok {
-            config.SysLogger.Infof("router: handlePushUserAttrUpdateRequests(): user to update %s could not be found in User DB", usr)
-            return
-        }
-        requestedUser.FailedPWAuthentication += 1
-    }
+	failedPWAuthentication := q.Get("failed-pw-authentication")
+	if len(failedPWAuthentication) != 0 {
+		database.WaitDatabaseList.Wait()
+		requestedUser, ok := database.Database.UserDB[usr]
+		if !ok {
+			config.SysLogger.Infof("router: handlePushUserAttrUpdateRequests(): user to update %s could not be found in User DB", usr)
+			return
+		}
+		requestedUser.FailedPWAuthentication += 1
+	}
 
-    config.SysLogger.Debugf("User %s just got updated", usr)
+	config.SysLogger.Debugf("User %s just got updated", usr)
 }
 
 func handleGetSystemRequests(w http.ResponseWriter, req *http.Request) {
-    if req.Method != "GET" {
-        config.SysLogger.Errorf("router: handleGetSystemRequests(): PDP sent an unsupported HTTP request method")
-        w.WriteHeader(405)
-        return
-    }
+	if req.Method != "GET" {
+		config.SysLogger.Errorf("router: handleGetSystemRequests(): PDP sent an unsupported HTTP request method")
+		w.WriteHeader(405)
+		return
+	}
 
-    config.SysLogger.Infof("router: handleGetSystemRequests(): PDP requested the system attributes")
-    w.Header().Set("Content-Type", "application/json")
-    json.NewEncoder(w).Encode(system.System)
+	config.SysLogger.Infof("router: handleGetSystemRequests(): PDP requested the system attributes")
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(system.System)
 }
 
 func (router *Router) ListenAndServeTLS() error {
