@@ -30,7 +30,6 @@ func reloadDatabase(databaseFilePath string) {
 			config.SysLogger.Fatalf("main: init(): could not update database: %v: trying again in 1 minute", err)
 		} else {
 			config.SysLogger.Info("main: init(): InitDatabase(): reloadDatabase(): successfully reloaded database")
-			config.SysLogger.Infof("User Leo allowed services: %v", database.Database.UserDB["Leo"].AllowedServices)
 		}
 		database.WaitDatabaseList.Add(-1)
 	}
