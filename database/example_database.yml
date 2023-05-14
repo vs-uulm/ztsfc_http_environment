@@ -2,7 +2,14 @@ user:
   Alice:
     user_id: "Alice"
     failed_pw_authentication: 0
+    enterprise_presence: true
     usual_time_begin: 8
     usual_time_end: 20
+    usual_access_rate: 5
     usual_services:
       - "service.ztsfc.com"
+    allowed_services:
+      - "service.ztsfc.com"
+    usual_devices:
+      - "deviceID"
+    trust_history: 17
