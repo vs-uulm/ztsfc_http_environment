@@ -22,10 +22,9 @@ import (
 
 func init() {
 	var confFilePath string
-	var databaseFilePath string
 
 	flag.StringVar(&confFilePath, "c", "./config/conf.yml", "Path to user defined yaml config file")
-	flag.StringVar(&databaseFilePath, "d", "./database/database.yml", "Path to user defined yaml database file")
+	flag.StringVar(&database.DatabaseFilePath, "d", "./database/database.yml", "Path to user defined yaml database file")
 	flag.Parse()
 
 	// Load config file
@@ -35,7 +34,7 @@ func init() {
 	}
 
 	// Load database file
-	err = yt.LoadYamlFile(databaseFilePath, &database.Database)
+	err = yt.LoadYamlFile(database.DatabaseFilePath, &database.Database)
 	if err != nil {
 		log.Fatalf("main: init(): could not load yaml file: %v", err)
 	}
@@ -51,7 +50,7 @@ func init() {
 	}
 	config.SysLogger.Debugf("loading logger configuration from %s - OK", confFilePath)
 
-	if err = confInit.InitDatabase(databaseFilePath); err != nil {
+	if err = confInit.InitDatabase(database.DatabaseFilePath); err != nil {
 		config.SysLogger.Fatalf("main: init(): %v", err)
 	}
 
