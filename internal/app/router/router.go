@@ -163,20 +163,20 @@ func handlePushUserAttrUpdateRequests(w http.ResponseWriter, req *http.Request) 
 		return
 	}
 
-	failedPWAuthentication := q.Get("failed-pw-authentication")
-	if len(failedPWAuthentication) != 0 {
+	failedAuthAttempts := q.Get("failed-auth-attempt")
+	if len(failedAuthAttempts) != 0 {
 		database.WaitDatabaseList.Wait()
 		requestedUser, ok := database.Database.UserDB[usr]
 		if !ok {
 			config.SysLogger.Infof("router: handlePushUserAttrUpdateRequests(): user to update %s could not be found in User DB", usr)
 			return
 		}
-		requestedUser.FailedPWAuthentication += 1
+		requestedUser.FailedAuthAttempts += 1
 		database.UpdateDatabase()
-		config.SysLogger.Infof("User %s has now %d failed authentication attemps", usr, requestedUser.FailedPWAuthentication)
+		config.SysLogger.Infof("User %s has now %d failed authentication attemps", usr, requestedUser.FailedAuthAttempts)
 	}
 
-	successPWAuthentication := q.Get("success-pw-authentication")
+	successPWAuthentication := q.Get("success-auth-attempt")
 	if len(successPWAuthentication) != 0 {
 		database.WaitDatabaseList.Wait()
 		requestedUser, ok := database.Database.UserDB[usr]
@@ -184,9 +184,9 @@ func handlePushUserAttrUpdateRequests(w http.ResponseWriter, req *http.Request) 
 			config.SysLogger.Infof("router: handlePushUserAttrUpdateRequests(): user to update %s could not be found in User DB", usr)
 			return
 		}
-		requestedUser.FailedPWAuthentication = 0
+		requestedUser.FailedAuthAttempts = 0
 		database.UpdateDatabase()
-		config.SysLogger.Infof("User %s has now %d failed authentication attemps", usr, requestedUser.FailedPWAuthentication)
+		config.SysLogger.Infof("User %s has now %d failed authentication attemps", usr, requestedUser.FailedAuthAttempts)
 	}
 
 	config.SysLogger.Debugf("User %s just got updated", usr)

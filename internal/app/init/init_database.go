@@ -22,6 +22,7 @@ func reloadDatabase(databaseFilePath string) {
 	reloadInterval := time.Tick(1 * time.Minute)
 	for range reloadInterval {
 		// Load current state of database file
+		database.WaitDatabaseList.Wait()
 		database.WaitDatabaseList.Add(1)
 		//database.Database.UserDB = make(map[string]*rattr.User)
 		//database.Database.DeviceDB = make(map[string]*rattr.Device)
