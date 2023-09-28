@@ -22,8 +22,7 @@ func reloadDatabase(databaseFilePath string) {
 	reloadInterval := time.Tick(1 * time.Minute)
 	for range reloadInterval {
 		// Load current state of database file
-		database.WaitDatabaseList.Wait()
-		database.WaitDatabaseList.Add(1)
+		database.WaitDatabaseList.Lock()
 		//database.Database.UserDB = make(map[string]*rattr.User)
 		//database.Database.DeviceDB = make(map[string]*rattr.Device)
 		err := yt.LoadYamlFile(databaseFilePath, &database.Database)
@@ -32,7 +31,7 @@ func reloadDatabase(databaseFilePath string) {
 		} else {
 			config.SysLogger.Info("main: init(): InitDatabase(): reloadDatabase(): successfully reloaded database")
 		}
-		database.WaitDatabaseList.Add(-1)
+		database.WaitDatabaseList.Unlock()
 	}
 
 }

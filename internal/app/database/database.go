@@ -16,7 +16,7 @@ import (
 var (
 	DatabaseFilePath string
 	Database         DatabaseT
-	WaitDatabaseList sync.WaitGroup
+	WaitDatabaseList sync.Mutex
 )
 
 type DatabaseT struct {
@@ -26,8 +26,7 @@ type DatabaseT struct {
 
 func UpdateDatabase() error {
 
-	WaitDatabaseList.Wait()
-	WaitDatabaseList.Add(1)
+	WaitDatabaseList.Lock()
 	// Create a backup of the file
 	backup, err := os.OpenFile(DatabaseFilePath+".bak", os.O_RDWR|os.O_CREATE, 0664)
 	if err != nil {
@@ -52,7 +51,7 @@ func UpdateDatabase() error {
 	if err != nil {
 		return fmt.Errorf("database: UpdateDatabase(): %v", err)
 	}
-	WaitDatabaseList.Add(-1)
+	WaitDatabaseList.Unlock()
 	config.SysLogger.Infof("router: UpdateDatabase(): database has been successfully updated")
 	return nil
 }

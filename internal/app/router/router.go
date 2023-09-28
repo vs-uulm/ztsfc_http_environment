@@ -78,7 +78,6 @@ func handleGetDeviceRequests(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	database.WaitDatabaseList.Wait()
 	requestedDevice, ok := database.Database.DeviceDB[dev]
 	if !ok {
 		config.SysLogger.Infof("router: handleGetDeviceRequests(): PDP requested a device that does not exist in the DB")
@@ -105,7 +104,6 @@ func handleUpdateDeviceRequests(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	database.WaitDatabaseList.Wait()
 	deviceToUpdate, ok := database.Database.DeviceDB[deviceUpdate.DeviceID]
 	if !ok {
 		config.SysLogger.Errorf("router: handleUpdateDeviceRequests(): device '%s' PDP requested to update does not exist", deviceUpdate.DeviceID)
@@ -132,7 +130,6 @@ func handleGetUserRequests(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	database.WaitDatabaseList.Wait()
 	requestedUser, ok := database.Database.UserDB[usr]
 	if !ok {
 		config.SysLogger.Infof("router: handleGetDeviceRequests(): PDP requested a user that does not exist in the DB")
@@ -165,7 +162,6 @@ func handlePushUserAttrUpdateRequests(w http.ResponseWriter, req *http.Request) 
 
 	failedAuthAttempts := q.Get("failed-auth-attempt")
 	if len(failedAuthAttempts) != 0 {
-		database.WaitDatabaseList.Wait()
 		requestedUser, ok := database.Database.UserDB[usr]
 		if !ok {
 			config.SysLogger.Infof("router: handlePushUserAttrUpdateRequests(): user to update %s could not be found in User DB", usr)
@@ -178,7 +174,6 @@ func handlePushUserAttrUpdateRequests(w http.ResponseWriter, req *http.Request) 
 
 	successPWAuthentication := q.Get("success-auth-attempt")
 	if len(successPWAuthentication) != 0 {
-		database.WaitDatabaseList.Wait()
 		requestedUser, ok := database.Database.UserDB[usr]
 		if !ok {
 			config.SysLogger.Infof("router: handlePushUserAttrUpdateRequests(): user to update %s could not be found in User DB", usr)
